@@ -105,3 +105,18 @@ def signup_for_activity(activity_name: str, email: str):
     # Add student
     activity["participants"].append(email)
     return {"message": f"Signed up {email} for {activity_name}"}
+
+
+@app.delete("/activities/{activity_name}/signup", status_code=204)
+def cancel_signup(activity_name: str, email: str) -> None:
+    """Cancel a student's signup for one activity."""
+    activity = activities.get(activity_name)
+    if activity is None:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    try:
+        activity["participants"].remove(email)
+    except ValueError as error:
+        raise HTTPException(
+            status_code=404, detail="Student is not signed up for this activity"
+        ) from error
